@@ -174,3 +174,42 @@
   float: left;
   width: 100%;
 }
+
+
+.loginPage{
+  background-color: #FFFFFF;
+}
+
+.loginPanel{
+  padding-top: 50%;
+}
+
+.loginPanel div{
+  background-color: #FFFFFF;
+}
+
+.loginLabel{
+  border-width: 2px;
+  margin: 5%;
+}
+
+.loginButton{
+
+}
+.loginInput{
+  padding-left: 2% !IMPORTANT;
+}
+
+.loginLogo{
+  padding-top: 25%;
+  padding-left: 37%;
+}
+
+.loginHeader{
+  text-align: center;
+  font-size: x-large;
+}
+
+.loginFooter{
+  font-size: small !IMPORTANT;
+}

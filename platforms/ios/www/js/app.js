@@ -49,7 +49,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
-  
+
   .state('tab.account', {
     url: '/account',
     views: {
@@ -70,12 +70,19 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     }
   })
   .state('tab.task-detail', {
-    url: '/tasks/:taskId',
+    url: '/tasks/:taskId?status=:taskStatus',
     views: {
       'tab-tasks': {
         templateUrl: 'templates/task-detail.html',
         controller: 'TaskDetailCtrl'
       }
+    }
+  })
+  .state('tab.task-detail-edit', {
+    url: '/tasks/:taskId?status=:taskStatus?mode=:edit',
+    views: {
+        templateUrl: 'templates/task-detail-edit.html',
+        controller: 'TaskDetailCtrl'
     }
   });
 

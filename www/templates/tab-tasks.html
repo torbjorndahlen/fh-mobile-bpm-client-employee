@@ -1,5 +1,5 @@
 <ion-view view-title="Tasks">
-  <ion-content data-ng-init="loadTasks()">
+  <ion-content data-ng-init"login.show()">
     <ion-refresher
       pulling-text="Pull to refresh..."
       on-refresh="loadTasks()">
@@ -13,9 +13,9 @@
             <ion-item class="item item-icon-right" ng-repeat="task in tasks | filter:statusIsReserved" href="#/tab/tasks/{{task.id}}?status={{task.status}}">
               <div class="taskListItem">
                 <h2>Task Name</h2>
-                <p>{{task.name}}</p>
-                <h2>Actual Owner</h2>
-                <p>{{task['actual-owner']}}</p>
+                <p>{{task['name']}}</p>
+                <h2>Customer Name</h2>
+                <p>{{task['created-by']}}</p>
               </div>
               <div>
                 <h2>Status</h2>
@@ -35,8 +35,8 @@
               <div class="taskListItem">
                 <h2>Task Name</h2>
                 <p>{{task.name}}</p>
-                <h2>Actual Owner</h2>
-                <p>{{task['actual-owner']}}</p>
+                <h2>Customer Name</h2>
+                <p>{{task['created-by']}}</p>
               </div>
               <div>
                 <h2>Status</h2>
@@ -53,8 +53,8 @@
               <div class="taskListItem">
                 <h2>Task Name</h2>
                 <p>{{task.name}}</p>
-                <h2>Actual Owner</h2>
-                <p class="ownerlessTask">{{task['actual-owner']}}</p>
+                <h2>Customer Name</h2>
+                <p>{{task['created-by']}}</p>
               </div>
               <div>
                 <h2>Status</h2>

@@ -1,20 +1,5 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, $ionicLoading) {
-
-    // Show loading...
-    $scope.show = function() {
-      $ionicLoading.show({
-        template: 'Loading...'
-      });
-    };
-
-    // Hide loading...
-    $scope.hide = function(){
-      $ionicLoading.hide();
-    };
-})
-
 .controller('AccountCtrl', function($scope, $ionicLoading) {
   var message = '';
   // Show loading...
@@ -29,41 +14,9 @@ angular.module('starter.controllers', [])
   $scope.hide = function(){
     $ionicLoading.hide();
   };
-
-  $scope.settings = {
-    enablePush: true
-  };
-
-  $scope.login = {
-  }
-
-  $scope.setLoginCredentials = function(){
-        message = 'Success';
-        $scope.show();
-        // store the credentials to the mobile device
-        window.localStorage.setItem("bpm_username", $scope.login.username);
-        window.localStorage.setItem("bpm_password", $scope.login.password);
-        window.localStorage.setItem("bpm_ip", $scope.login.ip);
-        window.localStorage.setItem("bpm_port", $scope.login.port);
-  };
-
-  $scope.initCredentials = function() {
-      if(window.localStorage.getItem("bpm_username") != undefined){
-        $scope.login.username = window.localStorage.getItem("bpm_username");
-      }
-      if(window.localStorage.getItem("bpm_password") != undefined){
-        $scope.login.password = window.localStorage.getItem("bpm_password");
-      }
-      if(window.localStorage.getItem("bpm_ip") != undefined){
-        $scope.login.ip = window.localStorage.getItem("bpm_ip");
-      }
-      if(window.localStorage.getItem("bpm_port") != undefined){
-        $scope.login.port = window.localStorage.getItem("bpm_port");
-      }
-    };
 })
 
-.controller('TasksCtrl', function($scope, $ionicLoading) {
+.controller('TasksCtrl', function($scope, $ionicLoading, $ionicModal, $timeout) {
   // Show loading...
   $scope.show = function() {
     $ionicLoading.show({
@@ -76,8 +29,42 @@ angular.module('starter.controllers', [])
     $ionicLoading.hide();
   };
 
+  $scope.credentials = function(){
+  };
+
+  $scope.closeLogin = function () {
+    if($scope.credentials.password && $scope.credentials.username){
+        $scope.showSucces();
+        // store the credentials to the mobile device
+        window.localStorage.setItem("employee_bpm_username", $scope.credentials.username);
+        window.localStorage.setItem("employee_bpm_password", $scope.credentials.password);
+        $timeout(function() {
+            $scope.login.hide();
+            allTasks();
+        }, 1000);
+      }else{
+        $scope.showFailed();
+      }
+  };
+
+  $scope.showSucces = function() {
+    $ionicLoading.show({
+      template: '<div class="ion-checkmark">&nbsp;Success</div>',
+      duration: 1000
+      });
+  };
+
+  $scope.showFailed = function() {
+    $ionicLoading.show({
+      template: '<div class="ion-minus-circled">&nbsp;Login Failed</div>',
+      duration: 1500
+    });
+  };
+
   $scope.listCanSwipe = true;
+
   $scope.tasks = [];
+
   $scope.loadTasks = function(){
     $scope.show();
     allTasks();
@@ -89,15 +76,13 @@ angular.module('starter.controllers', [])
 
   function allTasks(){
       $fh.cloud({
-        "path": "/bpm/loadTasks",
+        "path": "/bpm/runtimeTaskQuery",
         "method": "POST",
         "contentType": "application/json",
         "data": {
           "params": {
-            "username": window.localStorage.getItem("bpm_username"),
-            "password": window.localStorage.getItem("bpm_password"),
-            "ip": window.localStorage.getItem("bpm_ip"),
-            "port": window.localStorage.getItem("bpm_port")
+            "username": window.localStorage.getItem("epmloyee_bpm_username"),
+            "password": window.localStorage.getItem("epmloyee_bpm_password")
           }
         }
       }, function(res) {
@@ -111,18 +96,27 @@ angular.module('starter.controllers', [])
           $scope.hide();
         }else{
           $scope.noticeMessage = null;
-          $scope.tasks = res.taskSummaryList;
-          if(res.taskSummaryList.length == 0){
+          $scope.tasks = res.taskInfoList;
+          if(res.taskInfoList.length == 0){
             $scope.noticeMessage  = 'Tasklist is empty';
           }else{
-            for (i = 0; i < res.taskSummaryList.length; i++) {
-              if(isBlank(res.taskSummaryList[i]['actual-owner']))
-              res.taskSummaryList[i]['actual-owner'] = 'Ownerless';
+            for (i = 0; i < res.taskInfoList.length; i++) {
+              for(x = 0; x < res.taskInfoList[i]['variables'].length; x++){
+                  if(res.taskInfoList[i]['variables'][x]['name'] == 'username'){
+                     res.taskInfoList[i]['created-by'] = res.taskInfoList[i]['variables'][x]['value']['value']
+                  }
+                }
+              }
+            var taskArray = new Array();
+            for (i = 0; i < res.taskInfoList.length; i++) {
+              taskArray.push(res.taskInfoList[i].taskSummaries)
             }
-            $scope.tasks = res.taskSummaryList;
+            JSONArray jsonMainArr = taskArray.getJSONArray("source"); 
+            $scope.tasks = jsonMainArr
+            $scope.noticeMessage = res.taskInfoList
           }
-          $scope.hide();
         }
+          $scope.hide();
       }, function(msg,err) {
         $scope.tasks = null;
         $scope.noticeMessage = "$fh.cloud failed. Error: " + JSON.stringify(err);
@@ -142,10 +136,8 @@ angular.module('starter.controllers', [])
         "contentType": "application/json",
         "data": {
           "params": {
-            "username": window.localStorage.getItem("bpm_username"),
-            "password": window.localStorage.getItem("bpm_password"),
-            "ip": window.localStorage.getItem("bpm_ip"),
-            "port": window.localStorage.getItem("bpm_port")
+            "username": window.localStorage.getItem("epmloyee_bpm_username"),
+            "password": window.localStorage.getItem("epmloyee_bpm_password")
           },
           "taskId": task.id
         }
@@ -177,10 +169,8 @@ angular.module('starter.controllers', [])
         "contentType": "application/json",
         "data": {
           "params": {
-            "username": window.localStorage.getItem("bpm_username"),
-            "password": window.localStorage.getItem("bpm_password"),
-            "ip": window.localStorage.getItem("bpm_ip"),
-            "port": window.localStorage.getItem("bpm_port")
+            "username": window.localStorage.getItem("epmloyee_bpm_username"),
+            "password": window.localStorage.getItem("epmloyee_bpm_password")
           },
           "taskId": task.id
         }
@@ -212,10 +202,8 @@ angular.module('starter.controllers', [])
         "contentType": "application/json",
         "data": {
           "params": {
-            "username": window.localStorage.getItem("bpm_username"),
-            "password": window.localStorage.getItem("bpm_password"),
-            "ip": window.localStorage.getItem("bpm_ip"),
-            "port": window.localStorage.getItem("bpm_port")
+            "username": window.localStorage.getItem("epmloyee_bpm_username"),
+            "password": window.localStorage.getItem("epmloyee_bpm_password")
           },
           "taskId": task.id
         }
@@ -243,22 +231,43 @@ angular.module('starter.controllers', [])
         if (task.status == 'Reserved') {
           return true;
         }
-        return false;
+        return true;
   };
 
   $scope.statusIsInProgress = function(task){
       if (task.status == 'InProgress') {
         return true;
       }
-      return false;
+      return true;
   };
 
   $scope.statusIsReady = function(task){
       if (task.status == 'Ready') {
         return true;
       }
-      return false;
+      return true;
   };
+
+  // Load the modal from the given template URL
+  $ionicModal.fromTemplateUrl('templates/login.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(login) {
+    $scope.login = login;
+    login.show();
+  });
+
+  // Cleanup the modal when we're done with it!
+  $scope.$on('$destroy', function() {
+    $scope.login.remove();
+  });
+  // Execute action on hide modal
+  $scope.$on('login.hidden', function() {
+  });
+  // Execute action on remove modal
+  $scope.$on('login.removed', function() {
+  // Execute action
+  });
 })
 
 .controller('TaskDetailCtrl', function($scope, $stateParams, $ionicLoading, $ionicModal) {
@@ -296,10 +305,8 @@ angular.module('starter.controllers', [])
       "contentType": "application/json",
       "data": {
         "params": {
-          "username": window.localStorage.getItem("bpm_username"),
-          "password": window.localStorage.getItem("bpm_password"),
-          "ip": window.localStorage.getItem("bpm_ip"),
-          "port": window.localStorage.getItem("bpm_port")
+          "username": window.localStorage.getItem("epmloyee_bpm_username"),
+          "password": window.localStorage.getItem("epmloyee_bpm_password")
         },
         "taskId": $stateParams.taskId
       }
@@ -334,10 +341,8 @@ angular.module('starter.controllers', [])
         "contentType": "application/json",
         "data": {
           "params": {
-            "username": window.localStorage.getItem("bpm_username"),
-            "password": window.localStorage.getItem("bpm_password"),
-            "ip": window.localStorage.getItem("bpm_ip"),
-            "port": window.localStorage.getItem("bpm_port")
+            "username": window.localStorage.getItem("epmloyee_bpm_username"),
+            "password": window.localStorage.getItem("epmloyee_bpm_password")
           },
           "taskId": $stateParams.taskId,
           "firstname": $scope.taskContent.firstname,

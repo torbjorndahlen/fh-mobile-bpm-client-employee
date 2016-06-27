@@ -10,33 +10,31 @@
       </span>
     </div>
       <div class="list list-inset" ng-show="taskContent" data-ng-init="getTaskContent()">
-        <div class="item">
-          <b>Node name:</b> {{taskContent.NodeName}}
+        <h4>Customer request</h4>
+        <div class="row">
+          <div class="col item myContentColumn"><b>First Name:</b></div>
+          <div class="col item myContentColumn">{{taskContent.firstname}}</div>
         </div>
-        <div class="item">
-          <b>Error message:</b> {{taskContent.errorMessage}}
+        <div class="row">
+          <div class="col item myContentColumn"><b>Last Name:</b></div>
+          <div class="col item myContentColumn">{{taskContent.lastname}}</div>
         </div>
-        <div class="item">
-          <b>Timestamp:</b> {{taskContent.timestamp}}
+        <div class="row">
+          <div class="col item myContentColumn"><b>Request:</b></div>
+          <div class="col item myContentColumn">{{taskContent.request}}</div>
         </div>
-        <div class="item">
-          <b>Actor id:</b> {{taskContent.ActorId}}
+        <h4>Process request</h4>
+        <div class="row">
+          <div class="col item myContentColumn"><b>Decision:</b></div>
+          <div class="col item myContentColumn">{{taskContent.decision}}</div>
         </div>
-        <div class="item">
-          <b>Device type:</b> {{taskContent.deviceType}}
+        <div class="row">
+          <div class="col item myContentColumn"><b>Comment:</b></div>
+          <div class="col item myContentColumn">{{taskContent.decisioncomment}}</div>
         </div>
-        <div class="item">
-          <b>Device ID:</b> {{taskContent.deviceID}}
-        </div>
-        <div class="item">
-          <b>Errorcode:</b> {{taskContent.errorCode}}
-        </div>
-        <div class="item">
-          <b>Payload:</b> {{taskContent.payload}}
-        </div>
-        <div class="item">
-          <b>Skippable:</b> {{taskContent.Skippable}}
-        </div>
-      </div>
+        <button type="button" class="button button-block button-stable button-claim" ng-click="modal.show()" ng-show="statusIsInProgress()">
+          Edit
+        </button>
+    </div>
   </ion-content>
 </ion-view>
