@@ -111,7 +111,7 @@ angular.module('starter.controllers', [])
             for (i = 0; i < res.taskInfoList.length; i++) {
               taskArray.push(res.taskInfoList[i].taskSummaries)
             }
-            JSONArray jsonMainArr = taskArray.getJSONArray("source"); 
+            var jsonMainArr = taskArray.getJSONArray("source"); 
             $scope.tasks = jsonMainArr
             $scope.noticeMessage = res.taskInfoList
           }
