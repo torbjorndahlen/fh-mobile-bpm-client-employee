@@ -201,8 +201,13 @@
 }
 
 .loginLogo{
+  /*
   padding-top: 25%;
   padding-left: 37%;
+  */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .loginHeader{

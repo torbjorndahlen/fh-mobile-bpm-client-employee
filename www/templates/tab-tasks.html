@@ -14,7 +14,7 @@
               <div class="taskListItem">
                 <h2>Task Name</h2>
                 <p>{{task['name']}}</p>
-                <h2>Customer Name</h2>
+                <h2>Assigned To</h2>
                 <p>{{task['created-by']}}</p>
               </div>
               <div>
@@ -24,18 +24,18 @@
                 <p>{{task.id}}</p>
               </div>
               <i class="icon ion-chevron-right icon-accessory"></i>
-              <ion-option-button class="button-assertive button-start" ng-click="startTask(task)">
+              <ion-button class="button-assertive button-start" ng-click="startTask(task)">
                 Start
-              </ion-option-button>
-              <ion-option-button class="button-positive button-release" ng-click="releaseTask(task)">
+              </ion-button>
+              <ion-button class="button-positive button-release" ng-click="releaseTask(task)">
                 Release
-              </ion-option-button>
+              </ion-button>
             </ion-item>
             <ion-item class="item item-icon-right" ng-repeat="task in tasks | filter:statusIsInProgress" href="#/tab/tasks/{{task.id}}?status={{task.status}}">
               <div class="taskListItem">
                 <h2>Task Name</h2>
                 <p>{{task.name}}</p>
-                <h2>Customer Name</h2>
+                <h2>Assigned To</h2>
                 <p>{{task['created-by']}}</p>
               </div>
               <div>
@@ -45,15 +45,15 @@
                 <p>{{task.id}}</p>
               </div>
               <i class="icon ion-chevron-right icon-accessory"></i>
-              <ion-option-button class="button-positive button-release" ng-click="releaseTask(task)">
+              <ion-button class="button-positive button-release" ng-click="releaseTask(task)">
                 Release
-              </ion-option-button>
+              </ion-button>
             </ion-item>
             <ion-item class="item item-icon-right" ng-repeat="task in tasks | filter:statusIsReady" href="#/tab/tasks/{{task.id}}?status={{task.status}}">
               <div class="taskListItem">
                 <h2>Task Name</h2>
                 <p>{{task.name}}</p>
-                <h2>Customer Name</h2>
+                <h2>Created By</h2>
                 <p>{{task['created-by']}}</p>
               </div>
               <div>
@@ -63,9 +63,9 @@
                 <p>{{task.id}}</p>
               </div>
               <i class="icon ion-chevron-right icon-accessory"></i>
-              <ion-option-button class="button-assertive button-claim" ng-click="claimTask(task)">
+              <ion-button class="button-assertive button-claim" ng-click="claimTask(task)">
                 Claim
-              </ion-option-button>
+              </ion-button>
             </ion-item>
           </ion-list>
   </ion-content>

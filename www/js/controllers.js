@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AccountCtrl', function($scope, $ionicLoading) {
+.controller('AccountCtrl', function($http, $scope, $ionicLoading) {
   var message = '';
   // Show loading...
   $scope.show = function() {
@@ -16,7 +16,8 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('TasksCtrl', function($scope, $ionicLoading, $ionicModal, $timeout) {
+.controller('TasksCtrl', function($http, $scope, $ionicLoading, $ionicModal, $timeout) {
+
   // Show loading...
   $scope.show = function() {
     $ionicLoading.show({
@@ -75,6 +76,62 @@ angular.module('starter.controllers', [])
   }
 
   function allTasks(){
+
+    var req = {
+      method: 'POST',
+      url: "http://localhost:8000/bpm/runtimeTaskQuery",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        "params": {
+          "username": window.localStorage.getItem("employee_bpm_username"),
+          "password": window.localStorage.getItem("employee_bpm_password")
+        }
+        }
+       }
+
+    $http(req).then(
+        function successCallback(response) {
+            console.log('response: ' + JSON.stringify(response.data));
+            console.log('status: ' + response.status);
+            //console.log('data: ' + response.data);
+            $scope.noticeMessage = null;
+            if(response.data.taskInfoList != null) {
+              $scope.tasks = response.data.taskInfoList;
+            } else {
+              console.log('ERROR: ' + JSON.stringify(response.data));
+            }
+            if($scope.tasks.length == 0){
+              $scope.noticeMessage  = 'Tasklist is empty';
+            }else{
+              for (i = 0; i < $scope.tasks.length; i++) {
+                for(x = 0; x < $scope.tasks[i]['variables'].length; x++){
+                    if($scope.tasks[i]['variables'][x]['name'] == 'username'){
+                       $scope.tasks[i]['created-by'] = $scope.tasks[i]['variables'][x]['value']['value']
+                    }
+                  }
+                }
+              var taskArray = new Array();
+              for (i = 0; i < $scope.tasks.length; i++) {
+                taskArray.push($scope.tasks[i].taskSummaries[0]);
+                console.log('task[' + i + ']: ' + JSON.stringify(taskArray[i]));
+              }
+              //var jsonMainArr = taskArray.getJSONArray("source");
+              $scope.tasks = taskArray; //jsonMainArr;
+              //$scope.noticeMessage = $scope.tasks
+            }
+            $scope.hide();
+        },
+        function errorCallback(response) {
+            console.log('fail: ' + response.status + ' ' + response.statusText);
+            $scope.noticeMessage = "$http failed. Error: " + response.statusText + ' ' + response.statusText;
+            // Clear loading
+            $scope.hide();
+        }
+    );
+
+    /*
       $fh.cloud({
         "path": "/bpm/runtimeTaskQuery",
         "method": "POST",
@@ -111,7 +168,7 @@ angular.module('starter.controllers', [])
             for (i = 0; i < res.taskInfoList.length; i++) {
               taskArray.push(res.taskInfoList[i].taskSummaries)
             }
-            var jsonMainArr = taskArray.getJSONArray("source"); 
+            var jsonMainArr = taskArray.getJSONArray("source");
             $scope.tasks = jsonMainArr
             $scope.noticeMessage = res.taskInfoList
           }
@@ -123,6 +180,9 @@ angular.module('starter.controllers', [])
         // Clear loading
         $scope.hide();
       });
+      */
+
+
       // Stop the ion-refresher from spinning
       $scope.$broadcast('scroll.refreshComplete');
 
@@ -130,6 +190,38 @@ angular.module('starter.controllers', [])
 
   $scope.claimTask = function(task){
       $scope.show();
+
+      var req = {
+        method: 'POST',
+        url: "http://localhost:8000/bpm/claimTask",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: {
+          "params": {
+            "username": window.localStorage.getItem("employee_bpm_username"),
+            "password": window.localStorage.getItem("employee_bpm_password")
+          },
+          "taskId": task.id
+          }
+         }
+
+      $http(req).then(
+          function successCallback(response) {
+            console.log('response: ' + JSON.stringify(response.data));
+            console.log('status: ' + response.status);
+              allTasks();
+          },
+          function errorCallback(response) {
+              console.log('fail: ' + response.status + ' ' + response.statusText);
+              $scope.noticeMessage = "$http failed. Error: " + response.statusText + ' ' + response.statusText;
+              // Clear loading
+              $scope.hide();
+          }
+      );
+
+
+      /*
       $fh.cloud({
         "path": "/bpm/claimTask",
         "method": "POST",
@@ -159,10 +251,43 @@ angular.module('starter.controllers', [])
         // Clear loading
         $scope.hide();
       });
+      */
   };
 
   $scope.startTask = function(task){
       $scope.show();
+
+      var req = {
+        method: 'POST',
+        url: "http://localhost:8000/bpm/startTask",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: {
+          "params": {
+            "username": window.localStorage.getItem("employee_bpm_username"),
+            "password": window.localStorage.getItem("employee_bpm_password")
+          },
+          "taskId": task.id
+          }
+         }
+
+      $http(req).then(
+          function successCallback(response) {
+            console.log('response: ' + JSON.stringify(response.data));
+            console.log('status: ' + response.status);
+              allTasks();
+          },
+          function errorCallback(response) {
+              console.log('fail: ' + response.status + ' ' + response.statusText);
+              $scope.noticeMessage = "$http failed. Error: " + response.statusText + ' ' + response.statusText;
+              // Clear loading
+              $scope.hide();
+          }
+      );
+
+
+      /*
       $fh.cloud({
         "path": "/bpm/startTask",
         "method": "POST",
@@ -192,10 +317,45 @@ angular.module('starter.controllers', [])
         // Clear loading
         $scope.hide();
       });
+*/
+
+
   };
 
   $scope.releaseTask = function(task){
       $scope.show();
+
+      var req = {
+        method: 'POST',
+        url: "http://localhost:8000/bpm/releaseTask",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: {
+          "params": {
+            "username": window.localStorage.getItem("employee_bpm_username"),
+            "password": window.localStorage.getItem("employee_bpm_password")
+          },
+          "taskId": task.id
+          }
+         }
+
+      $http(req).then(
+          function successCallback(response) {
+            console.log('response: ' + JSON.stringify(response.data));
+            console.log('status: ' + response.status);
+              allTasks();
+          },
+          function errorCallback(response) {
+              console.log('fail: ' + response.status + ' ' + response.statusText);
+              $scope.noticeMessage = "$http failed. Error: " + response.statusText + ' ' + response.statusText;
+              // Clear loading
+              $scope.hide();
+          }
+      );
+
+
+      /*
       $fh.cloud({
         "path": "/bpm/releaseTask",
         "method": "POST",
@@ -225,27 +385,30 @@ angular.module('starter.controllers', [])
         // Clear loading
         $scope.hide();
       });
+*/
+
+
   };
 
   $scope.statusIsReserved = function(task){
         if (task.status == 'Reserved') {
           return true;
         }
-        return true;
+        return false;
   };
 
   $scope.statusIsInProgress = function(task){
       if (task.status == 'InProgress') {
         return true;
       }
-      return true;
+      return false;
   };
 
   $scope.statusIsReady = function(task){
       if (task.status == 'Ready') {
         return true;
       }
-      return true;
+      return false;
   };
 
   // Load the modal from the given template URL
@@ -270,7 +433,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller('TaskDetailCtrl', function($scope, $stateParams, $ionicLoading, $ionicModal) {
+.controller('TaskDetailCtrl', function($http, $scope, $state, $stateParams, $ionicLoading, $ionicModal) {
   $scope.readOnly = 'readonly';
 
   $scope.show = function() {
@@ -290,8 +453,9 @@ angular.module('starter.controllers', [])
       duration: 1000
     });
     //Reloading the Task-Tab
-    window.location.reload(true);
+    //window.location.reload(true);
   };
+
 
   $scope.getTaskContent = function(){
     $scope.show();
@@ -299,6 +463,40 @@ angular.module('starter.controllers', [])
   }
 
   function loadTaskContent(){
+
+    var req = {
+      method: 'POST',
+      url: "http://localhost:8000/bpm/loadTaskContent",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        "params": {
+          "username": window.localStorage.getItem("employee_bpm_username"),
+          "password": window.localStorage.getItem("employee_bpm_password")
+        },
+        "taskId": $stateParams.taskId
+        }
+       }
+
+    $http(req).then(
+        function successCallback(response) {
+          console.log('response: ' + JSON.stringify(response.data));
+          console.log('status: ' + response.status);
+            $scope.noticeMessage = null;
+            $scope.taskContent = response.data.contentMap;
+            $scope.hide();
+        },
+        function errorCallback(response) {
+            console.log('fail: ' + response.status + ' ' + response.statusText);
+            $scope.noticeMessage = "$http failed. Error: " + response.statusText + ' ' + response.statusText;
+            // Clear loading
+            $scope.hide();
+        }
+    );
+
+
+    /*
     $fh.cloud({
       "path": "/bpm/loadTaskContent",
       "method": "POST",
@@ -329,12 +527,60 @@ angular.module('starter.controllers', [])
       $scope.noticeMessage = "$fh.cloud failed. Error: " + JSON.stringify(err);
       $scope.hide();
     });
+*/
+
+
     // Stop the ion-refresher from spinning
     $scope.$broadcast('scroll.refreshComplete');
   };
 
+
   function completeTask(){
       $scope.show();
+
+      var req = {
+        method: 'POST',
+        url: "http://localhost:8000/bpm/completeTask",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: {
+          "params": {
+            "username": window.localStorage.getItem("employee_bpm_username"),
+            "password": window.localStorage.getItem("employee_bpm_password")
+          },
+          "taskId": $stateParams.taskId,
+          "firstname": $scope.taskContent.firstname,
+          "lastname": $scope.taskContent.lastname,
+          "request": $scope.taskContent.request,
+          "decision": $scope.taskContent.decision,
+          "decisioncomment": $scope.taskContent.decisioncomment
+          }
+         }
+
+      $http(req).then(
+          function successCallback(response) {
+            console.log('response: ' + JSON.stringify(response.data));
+            console.log('status: ' + response.status);
+              $scope.noticeMessage = null;
+              showSuccessMessage();
+              $scope.hide();
+
+
+
+
+
+          },
+          function errorCallback(response) {
+              console.log('fail: ' + response.status + ' ' + response.statusText);
+              $scope.noticeMessage = "$http failed. Error: " + response.statusText + ' ' + response.statusText;
+              // Clear loading
+              $scope.hide();
+          }
+      );
+
+
+      /*
       $fh.cloud({
         "path": "/bpm/completeTask",
         "method": "POST",
@@ -370,6 +616,9 @@ angular.module('starter.controllers', [])
         // Clear loading
         $scope.hide();
       });
+*/
+
+
   };
 
   $scope.statusIsInProgress = function(){
@@ -417,7 +666,12 @@ angular.module('starter.controllers', [])
   $scope.modalComplete = function(){
     completeTask();
     $scope.modal.hide();
-    location.href = '#/tab/tasks';
+    //location.href = '#/tab/tasks';
+
+    $state.transitionTo('tab.tasks', $stateParams, {
+      reload: true, location: true, inherit: true, notify: true
+    });
+
   }
 
   $scope.modalSave = function(){
